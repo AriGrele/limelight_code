@@ -27,14 +27,13 @@ class limelight:
         self.levels = ['Class','Order','Family','Genus','Species'] #taxonomic level labels
 
         self.yolo = torch.load(yolo_weights) #object localizer
-        self.yolo.eval()
-
+        
         if classifier == 'yolo': #species level yolo classifier
             self.enet = [torch.load(re.sub('/.+\\.pt$','/species.y.pt',yolo_weights))]
         else: #hierarchical classifier
             self.enet = [EfficientNet.from_pretrained(file, num_classes=self.nclass[i]) for i,file in enumerate(os.listdir(enet_weights))]
 
-        self.enet.eval()
+        self.l_eval()
         
         if not os.path.exists(self.errors): #error logging
             with open(self.errors,'w') as e:e.write('errors\n')
@@ -43,6 +42,12 @@ class limelight:
             if not os.path.exists(folder):
                 os.mkdir(folder)
 
+    def l_eval(self): #set to evaluation mode
+        self.yolo.eval()
+        for i,model in enumerate(self.enet):
+            model.eval()
+            self.enet[i]=model
+    
     def save_frames(self): #save split frames and original image for debug purposes
         for i,im in enumerate(self.frames):
             cv2.imwrite(f'{self.dst}/frames/{i}.jpg',im)
