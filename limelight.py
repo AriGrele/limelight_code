@@ -4,6 +4,8 @@ import time
 import os
 import re
 
+from PIL import Image
+
 from models import yolo
 from efficientnet_pytorch import EfficientNet
 
@@ -94,7 +96,7 @@ class limelight:
             self.stamp=time.localtime()
 
             self.boxes=self.yolo(self.frame)
-            self.insects=[self.frame[int(b[1]):int(b[3]),int(b[0]):int(b[2])] for box in self.boxes.xyxy for b in box]
+            self.insects=[self.frame[int(b[1]):int(b[3]),int(b[0]):int(b[2])].resize(resolution()) for box in self.boxes.xyxy for b in box]
             self.classes=[model(self.insects) for model in self.enet]
 
             self.save_img()
