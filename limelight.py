@@ -58,12 +58,18 @@ class limelight:
         for i,im in enumerate(self.insects):
             cv2.imwrite(f'{self.dst}/images/{self.stamp}_{i}.jpg',im)
 
-    def save_cls(self): #save taxon predicitons with row names of taxonomic level / timestamp / index
+    def save_cls(self): #save taxon predictions with row names of taxonomic level / timestamp / index
         with open(f'{dst}/data.txt','a') as out:
-            for i,dat in enumerate(self.classes):
-                name=self.levels[i]
-                for j,obj in enumerate(dat):
-                    out.write(f'{name} {self.stamp}_{j} {" ".join(dat)}')
+            if len(self.classes)>1:
+                for i,dat in enumerate(self.classes):
+                    name=self.levels[i]
+                    for j,obj in enumerate(dat):
+                        out.write(f'{name} {self.stamp}_{j} {" ".join(obj)}')
+
+            else:
+                for i,dat in enumerate(self.classes.xyxy):
+                    out.write(f'species {self.stamp}_{i} {dat[4]} {dat[5]')
+                
 
     def split_frames(self,img): #split frame into columns and rows based on split_n (x,y)
 
