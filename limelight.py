@@ -68,7 +68,7 @@ class limelight:
 
             else:
                 for i,dat in enumerate(self.classes.xyxy):
-                    out.write(f'species {self.stamp}_{i} {dat[4]} {dat[5]')
+                    out.write(f'species {self.stamp}_{i} {dat[4]} {dat[5]}')
                 
 
     def split_frames(self,img): #split frame into columns and rows based on split_n (x,y)
@@ -88,7 +88,7 @@ class limelight:
                 y = cumsum([h//n[1]]*n[1])
 
                 self.frame =img #store original image and list of [original, split images]
-                self.frames=[img]+[img[splity:y[j+1],splitx:x[i+1]] for i, splitx in enumerate(x) if i != n[0] for j, splity in enumerate(y) if j != n[1]]               
+                self.frames=[cv2.resize(img,resolution)]+[cv2.resize(img[splity:y[j+1],splitx:x[i+1]],resolution) for i, splitx in enumerate(x) if i != n[0] for j, splity in enumerate(y) if j != n[1]]               
 
                 self.save_frames()
                 
@@ -102,7 +102,7 @@ class limelight:
             self.stamp=time.localtime()
 
             self.boxes=self.yolo(self.frame)
-            self.insects=[self.frame[int(b[1]):int(b[3]),int(b[0]):int(b[2])].resize(resolution()) for box in self.boxes.xyxy for b in box]
+            self.insects=[cv2.resize(self.frame[int(b[1]):int(b[3]),int(b[0]):int(b[2])],(resolution[0]/2,resolution[1]/2)) for box in self.boxes.xyxy for b in box]
             self.classes=[model(self.insects) for model in self.enet]
 
             self.save_img()
